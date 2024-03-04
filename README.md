@@ -9,13 +9,13 @@ Este é um script em Python que permite configurar um servidor de DNS BIND no Li
 Para configurar uma zona direta, execute o seguinte comando:
 
 ```bash
-python configure_bind.py --zonadireta nome_da_zona
+python 1.py --zonadireta nome_da_zona
 ```
 
 ou
 
 ```bash
-python configure_bind.py -zd nome_da_zona
+python 1.py -zd nome_da_zona
 ```
 
 Substitua `nome_da_zona` pelo nome da sua zona direta.
@@ -25,13 +25,13 @@ Substitua `nome_da_zona` pelo nome da sua zona direta.
 Para configurar uma zona reversa, execute o seguinte comando:
 
 ```bash
-python configure_bind.py --zonareversa ip_reverso
+python 1.py --zonareversa ip_reverso
 ```
 
 ou
 
 ```bash
-python configure_bind.py -zona ip_reverso
+python 1.py -zona ip_reverso
 ```
 
 Substitua `ip_reverso` pelo endereço IP reverso da sua rede.
@@ -41,7 +41,7 @@ Substitua `ip_reverso` pelo endereço IP reverso da sua rede.
 Para reiniciar o serviço BIND, execute o seguinte comando:
 
 ```bash
-python configure_bind.py restart
+python 1.py restart
 ```
 
 ### Parar o BIND
@@ -49,7 +49,7 @@ python configure_bind.py restart
 Para parar o serviço BIND, execute o seguinte comando:
 
 ```bash
-python configure_bind.py stop
+python 1.py stop
 ```
 
 ### Iniciar o BIND
@@ -57,7 +57,7 @@ python configure_bind.py stop
 Para iniciar o serviço BIND, execute o seguinte comando:
 
 ```bash
-python configure_bind.py start
+python 1.py start
 ```
 
 ### Verificar Status do BIND
@@ -65,7 +65,7 @@ python configure_bind.py start
 Para verificar o status do serviço BIND, execute o seguinte comando:
 
 ```bash
-python configure_bind.py status
+python 1.py status
 ```
 
 ## Pré-requisitos
