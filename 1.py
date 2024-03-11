@@ -1,6 +1,14 @@
 import argparse #usado para analisar argumentos de linha de comando.
 import subprocess # módulo subprocess para executar comandos do sistema operacional. (substitui o OS)
 
+def configurar_slave(nome_zona):
+   
+    with open('/etc/bind/named.conf.local', 'a') as f:
+        f.write(f'zone "{nome_zona}" IN  {{\n')
+        f.write(f'    masters "172.203.34.164";\n') #Esta linha escreve outra string no arquivo named.conf.local, especificando o tipo da zona como "master".
+        f.write(f' file "/etc/bind/db.{nome_zona}";\n')
+        f.write(f'}};\n')
+
 def configurar_zona_direta(nome_zona):
     # Adiciona uma entrada no arquivo /etc/bind/named.conf.local
     with open('/etc/bind/named.conf.local', 'a') as f:
@@ -15,12 +23,13 @@ def configurar_zona_direta(nome_zona):
         f.write(f'zone "{nome_zona}" IN {{\n') #Esta linha escreve uma string no arquivo named.conf.local. A string contém a declaração de uma zona no formato do arquivo de configuração do Bind. O nome da zona é substituído pelo valor de nome_zona.
         f.write(f'    type master;\n') #Esta linha escreve outra string no arquivo named.conf.local, especificando o tipo da zona como "master".
         f.write(f'    file "/etc/bind/db.{nome_zona}";\n') #especificando o caminho do arquivo de zona direta associado a esta zona.
+        f.write(f'    allow-updates "172.203.126.133;";')
         f.write(f'}};\n') #Esta linha fecha a declaração da zona no arquivo named.conf.local
 
     # Cria o arquivo de zona direta que é aberto no modo de escrita (w). O objeto novamente é atribuido à variável 'f'
     with open(f'/etc/bind/db.{nome_zona}', 'w') as f:
         f.write(f'$TTL    604800\n')
-        f.write(f'@       IN      SOA     ns.{nome_zona}. admin.{nome_zona}. (\n')
+        f.write(f'@       IN      SOA     ns.{nome_zona}. root.{nome_zona}. (\n')
         f.write(f'                  3     ; Serial\n')
         f.write(f'             604800     ; Refresh\n')
         f.write(f'              86400     ; Retry\n')
@@ -28,7 +37,7 @@ def configurar_zona_direta(nome_zona):
         f.write(f'             604800 )   ; Negative Cache TTL\n')
         f.write(f';\n')                                             # escreve uma linha vazia no arquivo, apenas para manter a formatação.
         f.write(f'@       IN      NS      ns.{nome_zona}.\n')  #NS (name server)
-        f.write(f'ns      IN      A       192.168.1.1\n')  # IP do servidor DNS BIND
+        f.write(f'ns      IN      A       172.203.126.133;172.203.34.164\n')  # IP do servidor DNS BIND
 
     print(f"Zona direta configurada para {nome_zona}")
 
@@ -45,7 +54,7 @@ def configurar_zona_reversa(ip_reverso):
     # Cria o arquivo de zona reversa
     with open(f'/etc/bind/db.{subnet}', 'w') as f:
         f.write(f'$TTL    604800\n')
-        f.write(f'@       IN      SOA     ns.{subnet}. admin.{subnet}. (\n')
+        f.write(f'@       IN      SOA     ns.{subnet}. root.{subnet}. (\n')
         f.write(f'                  3     ; Serial\n')
         f.write(f'             604800     ; Refresh\n')
         f.write(f'              86400     ; Retry\n')
@@ -54,7 +63,7 @@ def configurar_zona_reversa(ip_reverso):
         f.write(f';\n')
         f.write(f'@       IN      NS      ns.{subnet}.\n')
         # Inverte os três últimos octetos do IP reverso para o endereço de rede
-        network_address = '.'.join(ip_parts[:3][::-1])
+        network_address = '.'.join(reversed(ip_parts[:3][::-1]))
         f.write(f'{network_address} IN PTR ns.{subnet}.\n') #Esta linha escreve no arquivo um registro PTR (Pointer) associando o endereço de rede ao servidor de nomes para a sub-rede especificada.
 
     print(f"Zona reversa configurada para {ip_reverso}")
@@ -72,8 +81,10 @@ def verificar_status_bind():
     subprocess.run(["sudo", "service", "named", "status"])
 
 def main():
+
     parser = argparse.ArgumentParser(description="Configurar servidor de DNS BIND")
     parser.add_argument("--zonadireta", "-zd", help="Configurar zona direta")
+    parser.add_argument("--zonaslave", help="Configurar slave")
     parser.add_argument("--zonareversa", "-zona", help="Configurar zona reversa")
     parser.add_argument("action", choices=["start", "stop", "restart", "status"], help="Ação a ser executada")
 
@@ -83,6 +94,8 @@ def main():
         configurar_zona_direta(args.zonadireta)
     elif args.zonareversa:
         configurar_zona_reversa(args.zonareversa)
+    elif args.zonaslave:
+        configurar_slave(args.zonaslave)
     elif args.action == "start":
         iniciar_bind()
     elif args.action == "stop":
