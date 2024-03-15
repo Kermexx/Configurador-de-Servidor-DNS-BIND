@@ -5,7 +5,7 @@ def configurar_slave(nome_zona):
    
     with open('/etc/bind/named.conf.local', 'a') as f:
         f.write(f'zone "{nome_zona}" IN  {{\n')
-        f.write(f'    masters "172.203.34.164";\n') #Esta linha escreve outra string no arquivo named.conf.local, especificando o tipo da zona como "master".
+        f.write(f'    masters "xxx.xxx.xx.xxx";\n') #Esta linha escreve outra string no arquivo named.conf.local, especificando o tipo da zona como "master".
         f.write(f' file "/etc/bind/db.{nome_zona}";\n')
         f.write(f'}};\n')
 
@@ -23,7 +23,7 @@ def configurar_zona_direta(nome_zona):
         f.write(f'zone "{nome_zona}" IN {{\n') #Esta linha escreve uma string no arquivo named.conf.local. A string contém a declaração de uma zona no formato do arquivo de configuração do Bind. O nome da zona é substituído pelo valor de nome_zona.
         f.write(f'    type master;\n') #Esta linha escreve outra string no arquivo named.conf.local, especificando o tipo da zona como "master".
         f.write(f'    file "/etc/bind/db.{nome_zona}";\n') #especificando o caminho do arquivo de zona direta associado a esta zona.
-        f.write(f'    allow-updates "172.203.126.133;";')
+        f.write(f'    allow-updates "xxx.xxx.xx.xxx;";')
         f.write(f'}};\n') #Esta linha fecha a declaração da zona no arquivo named.conf.local
 
     # Cria o arquivo de zona direta que é aberto no modo de escrita (w). O objeto novamente é atribuido à variável 'f'
@@ -37,7 +37,7 @@ def configurar_zona_direta(nome_zona):
         f.write(f'             604800 )   ; Negative Cache TTL\n')
         f.write(f';\n')                                             # escreve uma linha vazia no arquivo, apenas para manter a formatação.
         f.write(f'@       IN      NS      ns.{nome_zona}.\n')  #NS (name server)
-        f.write(f'ns      IN      A       172.203.126.133;172.203.34.164\n')  # IP do servidor DNS BIND
+        f.write(f'ns      IN      A       xxx.xxx.xx.xxx;xxx.xxx.xx.xxx\n')  # IP do servidor DNS BIND
 
     print(f"Zona direta configurada para {nome_zona}")
 
